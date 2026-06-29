@@ -24,7 +24,7 @@
   .legend span{display:inline-flex;align-items:center;gap:6px}
   .dot{width:11px;height:11px;border-radius:50%;display:inline-block}
   .dot.ok{background:var(--ok)} .dot.note{background:var(--note)} .dot.gap{background:var(--gap)}
-  .tree{padding:10px 16px 60px;overflow-x:auto}
+  .tree{padding:10px 16px 60px 260px;overflow-x:auto}
   ul.gen{list-style:none;margin:0;padding:0}
   ul.gen ul{list-style:none;margin:6px 0 0 0;padding:0 0 0 26px;
     border-left:2px solid var(--line)}
@@ -44,15 +44,24 @@
   .card .nm{font-weight:bold;font-size:15px}
   .card .meta{font-size:12.5px;color:var(--muted)}
   .card .sibs{font-size:11.5px;color:#8a7d5e;font-style:italic;margin-top:2px;max-width:300px}
-  .person-row{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}
+  .person-row{position:relative;display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}
   .sib-conj{align-self:center;font-size:10px;text-transform:uppercase;letter-spacing:.5px;
     color:#9a8c66;white-space:nowrap}
-  .sibwrap{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;
+  .sibwrap{display:flex;flex-direction:column;gap:6px;align-items:flex-start;
     padding-left:10px;border-left:2px dotted var(--line)}
   .sibcard{background:#f3eee1;border:1px dashed var(--line);border-radius:8px;
     padding:6px 10px;max-width:215px}
   .sibcard .sibnm{display:block;font-weight:bold;font-size:12.5px;color:#4a4334}
   .sibcard .sibinfo{display:block;font-size:11px;color:var(--muted);margin-top:1px;line-height:1.35}
+  .grp-tag{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#9a8c66;margin-bottom:2px}
+  .selfcol{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+  .kidwrap{position:absolute;right:100%;top:0;margin-right:14px;
+    display:flex;flex-direction:column;gap:6px;padding-right:12px;
+    border-right:2px dotted var(--line)}
+  .kidcard{background:#e6eef0;border:1px dashed #b3c4ca;border-radius:8px;padding:6px 10px;max-width:200px}
+  .spousecard{background:#f1e7ee;border:1px dashed #ccb6c4;border-radius:8px;padding:6px 10px;max-width:215px;align-self:flex-start}
+  .kidcard .sibnm,.spousecard .sibnm{display:block;font-weight:bold;font-size:12.5px;color:#4a4334}
+  .kidcard .sibinfo,.spousecard .sibinfo{display:block;font-size:11px;color:var(--muted);margin-top:1px;line-height:1.35}
   .card .rel{font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.5px}
   .badge{font-size:10px;padding:1px 7px;border-radius:10px;align-self:flex-start;margin-top:3px}
   .badge.ok{background:var(--ok-bg);color:var(--ok)}
@@ -110,7 +119,9 @@ const TREE = {
   id:"maksym", name:"Гірілішен Максим Володимирович", born:"07.12.1981",
   rel:"Пробанд", status:"note",
   facts:{"Народження":"07.12.1981"},
-  sibs:["Гірілішен Андрій Володимирович (08.08.1969)","Гірілішена Аня Володимирівна (23.02.1973)"],
+  spouse:"Гірілішена (Кремез) Людмила Віталіївна (06.09.1982)",
+  kids:["Гірілішена Майя Максимівна (28.08.2011)","Гірілішена Емма Максимівна (04.09.2015)"],
+  sibs:["Гірілішен Андрій Володимирович (08.08.1969)","Гірілішена (Волинюк) Анна Володимирівна (23.02.1973)"],
   src:"max.txt, нотатки",
   children:[
     {
@@ -278,9 +289,13 @@ const TREE = {
 const STAT_LABEL={ok:"підтверджено документом",note:"зі слів / нотаток",gap:"прогалина / під сумнівом"};
 
 function splitSib(s){
-  const m=s.search(/\s\(|\s—/);
-  if(m<0) return {nm:s, info:""};
-  return {nm:s.slice(0,m).trim(), info:s.slice(m).trim()};
+  // ім'я лишається жирним (разом із дівочим у дужках); у сіре йде дата або опис
+  let best=-1;
+  const dash=s.indexOf(" — "); if(dash>=0) best=dash;
+  const dm=s.match(/\s\([^)]*\d[^)]*\)/);            // перша дужка з цифрою = дата
+  if(dm && (best<0 || dm.index<best)) best=dm.index;
+  if(best<0) return {nm:s.trim(), info:""};
+  return {nm:s.slice(0,best).trim(), info:s.slice(best).trim()};
 }
 function render(node){
   const li=document.createElement("li");
@@ -293,19 +308,32 @@ function render(node){
     <span class="meta">${node.born&&node.born!=="?"?"нар. "+node.born:"дати невідомі"}</span>
     <span class="badge ${node.status}">${STAT_LABEL[node.status]}</span>`;
   card.onclick=()=>openModal(node);
-  row.appendChild(card);
+  if(node.kids&&node.kids.length){
+    const kw=document.createElement("div"); kw.className="kidwrap";
+    const kt=document.createElement("span"); kt.className="grp-tag"; kt.textContent="діти"; kw.appendChild(kt);
+    node.kids.forEach(s=>{const {nm,info}=splitSib(s);const d=document.createElement("div");d.className="kidcard";
+      d.innerHTML=`<span class="sibnm">${nm}</span>${info?`<span class="sibinfo">${info}</span>`:""}`;kw.appendChild(d);});
+    row.appendChild(kw);
+  }
+  const selfcol=document.createElement("div"); selfcol.className="selfcol";
+  if(node.spouse){
+    const {nm,info}=splitSib(node.spouse);
+    const sp=document.createElement("div"); sp.className="spousecard";
+    sp.innerHTML=`<span class="grp-tag">дружина/чоловік</span><span class="sibnm">${nm}</span>${info?`<span class="sibinfo">${info}</span>`:""}`;
+    selfcol.appendChild(sp);
+  }
+  selfcol.appendChild(card);
   if(node.sibs&&node.sibs.length){
-    const conj=document.createElement("span"); conj.className="sib-conj"; conj.textContent="брати/сестри";
-    row.appendChild(conj);
-    const wrap=document.createElement("div"); wrap.className="sibwrap";
+    const conj=document.createElement("span"); conj.className="grp-tag sib-under"; conj.textContent="брати/сестри";
+    selfcol.appendChild(conj);
     node.sibs.forEach(s=>{
       const {nm,info}=splitSib(s);
       const sc=document.createElement("div"); sc.className="sibcard";
       sc.innerHTML=`<span class="sibnm">${nm}</span>${info?`<span class="sibinfo">${info}</span>`:""}`;
-      wrap.appendChild(sc);
+      selfcol.appendChild(sc);
     });
-    row.appendChild(wrap);
   }
+  row.appendChild(selfcol);
   li.appendChild(row);
   if(node.children&&node.children.length){
     const ul=document.createElement("ul");
