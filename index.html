@@ -44,6 +44,15 @@
   .card .nm{font-weight:bold;font-size:15px}
   .card .meta{font-size:12.5px;color:var(--muted)}
   .card .sibs{font-size:11.5px;color:#8a7d5e;font-style:italic;margin-top:2px;max-width:300px}
+  .person-row{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}
+  .sib-conj{align-self:center;font-size:10px;text-transform:uppercase;letter-spacing:.5px;
+    color:#9a8c66;white-space:nowrap}
+  .sibwrap{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;
+    padding-left:10px;border-left:2px dotted var(--line)}
+  .sibcard{background:#f3eee1;border:1px dashed var(--line);border-radius:8px;
+    padding:6px 10px;max-width:215px}
+  .sibcard .sibnm{display:block;font-weight:bold;font-size:12.5px;color:#4a4334}
+  .sibcard .sibinfo{display:block;font-size:11px;color:var(--muted);margin-top:1px;line-height:1.35}
   .card .rel{font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.5px}
   .badge{font-size:10px;padding:1px 7px;border-radius:10px;align-self:flex-start;margin-top:3px}
   .badge.ok{background:var(--ok-bg);color:var(--ok)}
@@ -268,21 +277,36 @@ const TREE = {
 
 const STAT_LABEL={ok:"підтверджено документом",note:"зі слів / нотаток",gap:"прогалина / під сумнівом"};
 
+function splitSib(s){
+  const m=s.search(/\s\(|\s—/);
+  if(m<0) return {nm:s, info:""};
+  return {nm:s.slice(0,m).trim(), info:s.slice(m).trim()};
+}
 function render(node){
   const li=document.createElement("li");
+  const row=document.createElement("div");
+  row.className="person-row";
   const card=document.createElement("div");
   card.className="card "+node.status;
-  let sibsLine="";
-  if(node.sibs&&node.sibs.length){
-    sibsLine=`<span class="sibs">👥 брати/сестри: ${node.sibs.map(s=>s.split(" (")[0]).join(", ")}</span>`;
-  }
   card.innerHTML=`<span class="rel">${node.rel}</span>
     <span class="nm">${node.name}</span>
     <span class="meta">${node.born&&node.born!=="?"?"нар. "+node.born:"дати невідомі"}</span>
-    ${sibsLine}
     <span class="badge ${node.status}">${STAT_LABEL[node.status]}</span>`;
   card.onclick=()=>openModal(node);
-  li.appendChild(card);
+  row.appendChild(card);
+  if(node.sibs&&node.sibs.length){
+    const conj=document.createElement("span"); conj.className="sib-conj"; conj.textContent="брати/сестри";
+    row.appendChild(conj);
+    const wrap=document.createElement("div"); wrap.className="sibwrap";
+    node.sibs.forEach(s=>{
+      const {nm,info}=splitSib(s);
+      const sc=document.createElement("div"); sc.className="sibcard";
+      sc.innerHTML=`<span class="sibnm">${nm}</span>${info?`<span class="sibinfo">${info}</span>`:""}`;
+      wrap.appendChild(sc);
+    });
+    row.appendChild(wrap);
+  }
+  li.appendChild(row);
   if(node.children&&node.children.length){
     const ul=document.createElement("ul");
     node.children.forEach(c=>ul.appendChild(render(c)));
