@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Родини Сікорських — Мукарівська парафія</title>
+<style>
+  :root{
+    --mic:#2563eb;      /* Мицівці */
+    --vyh:#16a34a;      /* Вихрівка */
+    --oth:#9ca3af;      /* інше село */
+    --our:#d97706;      /* наша родина */
+    --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --bg:#f8fafc;
+  }
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);
+       margin:0;padding:32px 20px;background:#fff;line-height:1.5}
+  .wrap{max-width:1080px;margin:0 auto}
+  h1{font-size:26px;margin:0 0 4px}
+  .sub{color:var(--muted);margin:0 0 24px;font-size:14px}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;margin:0 0 24px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
+  h2{font-size:16px;margin:28px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  /* timeline */
+  .axis{position:relative;height:22px;margin:6px 0 4px;border-bottom:1px solid var(--line)}
+  .tick{position:absolute;top:0;font-size:11px;color:var(--muted);transform:translateX(-50%)}
+  .tick i{position:absolute;top:16px;left:50%;width:1px;height:6px;background:var(--line)}
+  .row{display:grid;grid-template-columns:230px 1fr;gap:12px;align-items:center;
+       padding:7px 0;border-bottom:1px solid var(--line)}
+  .fam{font-size:13px}
+  .fam b{font-size:13.5px}
+  .fam small{color:var(--muted);display:block}
+  .track{position:relative;height:26px;background:var(--bg);border-radius:6px}
+  .bar{position:absolute;top:3px;height:20px;border-radius:5px;display:flex;align-items:center;
+       padding:0 8px;color:#fff;font-size:11.5px;white-space:nowrap;overflow:hidden;font-weight:600}
+  .bar.our{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--our)}
+  /* cards */
+  .card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:10px 0;background:#fff}
+  .card.our{border-color:var(--our);background:#fffbeb}
+  .card h3{margin:0 0 4px;font-size:15px}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;color:#fff;vertical-align:middle;margin-left:6px}
+  .kids{margin:6px 0 0;font-size:13px}
+  .kids .k{display:inline-block;background:var(--bg);border:1px solid var(--line);border-radius:16px;
+           padding:2px 9px;margin:3px 4px 0 0;font-size:12px}
+  .meta{font-size:12.5px;color:var(--muted);margin-top:6px}
+  table{border-collapse:collapse;width:100%;font-size:13px;margin-top:8px}
+  th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+  th{background:var(--bg);font-size:12px}
+  .tips{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px 18px;font-size:13px;margin-top:14px}
+  .tips li{margin:4px 0}
+  .foot{color:var(--muted);font-size:12px;margin-top:26px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Родини Сікорських — Мукарівська римо-католицька парафія</h1>
+  <p class="sub">Робоче зведення за метричними книгами (ДАХмО, Ф.17). Села Мицівці й Вихрівка, кін. XIX – поч. XX ст. Наша гілка (Антоніни) — виділена.</p>
+
+  <div class="legend">
+    <span><i class="dot" style="background:var(--our)"></i> НАША родина</span>
+    <span><i class="dot" style="background:var(--mic)"></i> с. Мицівці</span>
+    <span><i class="dot" style="background:var(--vyh)"></i> с. Вихрівка</span>
+    <span><i class="dot" style="background:var(--oth)"></i> інше село</span>
+  </div>
+
+  <h2>Шкала: коли яка родина «активна» (роки народжень дітей)</h2>
+  <div id="axis" class="axis"></div>
+  <div id="timeline"></div>
+
+  <h2>Родини — детально</h2>
+  <div id="cards"></div>
+
+  <h2>Зведена таблиця</h2>
+  <table id="tbl">
+    <thead><tr><th>#</th><th>Батько × Мати (дів. прізв.)</th><th>Село</th><th>Роки</th><th>Діти</th><th>Коло хресних</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="tips">
+    <b>🔑 Як розрізняти родини (коли ім'я батька нечітке):</b>
+    <ul>
+      <li><b>Село:</b> наша — <b>Мицівці</b>; вихрівські (Михаил×Опольська, Антон×Мищинська, Іван×Тонтмановська, Франц×Гординська) — <b>Вихрівка</b>.</li>
+      <li><b>Мати:</b> наша — <b>Анна з Гальовських</b>. Інші матері: Шидловська, Опольська, Мищинська, Тонтмановська, Карвацька, Корчинська, Крушельницька/Павлина, Гординська.</li>
+      <li><b>Хресні (найнадійніше):</b> наша — <b>Вишимірські / Козловські / Добровольські</b>. Опольські/Боровські → вихрівський Михаил; Шидловські → Станіслав; Тонтмановські/Козицькі → Іван (Вихрівка); Крушельницькі/Януш → Іван (Мицівці, Карвацька); Борковські/Ясінські → Рафаїл; Каплінські → Франц.</li>
+    </ul>
+  </div>
+
+  <p class="foot">Джерело даних: <code>Сікорські_родини_Мукарова_РОБОЧЕ.md</code>. Оновлюється в міру читання сканів.</p>
+</div>
+
+<script>
+const YMIN=1879, YMAX=1907, SPAN=YMAX-YMIN;
+const V={m:'var(--mic)',v:'var(--vyh)',o:'var(--oth)'};
+const fam=[
+ {n:'⭐',our:true,f:'відст. солдат Михаил × Анна',mother:'Гальовська',village:'Мицівці',vc:'m',y0:1882,y1:1900,
+  kids:['Франц¹ 1882','Антон 1883','Франц² 1884','Михалина 1890','Антоніна ~1892*','Броніслав 1894','Йосиф 1900'],
+  god:'Вишимірські, Козловські, Добровольські'},
+ {n:'2',f:'Станіслав × Анна/Антоніна',mother:'Шидловська',village:'Мицівці',vc:'m',y0:1890,y1:1903,
+  kids:['Николай 1890','Йосиф 1892','Михал 1895','Йосиф 1903'],god:'Шидловські, Борські'},
+ {n:'3',f:'відст. солдат Михаил × Катерина',mother:'Опольська',village:'Вихрівка',vc:'v',y0:1889,y1:1905,
+  kids:['Цецилія 1889','Фелікс 1891','Бригіда 1896','Павел ~1898','Іван 1900','Игнатій 1905'],god:'Опольські, Боровські, Мазури'},
+ {n:'4',f:'відст. солдат Антон × Анна',mother:'Мищинська/Ленцинська',village:'Вихрівка',vc:'v',y0:1891,y1:1893,
+  kids:['Каєтан 1891','Йосиф 1893'],god:'Пораєвські, Букрені'},
+ {n:'5',f:'Іван × Феофіла',mother:'Тонтмановська',village:'Вихрівка',vc:'v',y0:1895,y1:1902,
+  kids:['Юліан 1895','Рафаїл 1902'],god:'Тонтмановські, Козицькі'},
+ {n:'6',f:'Іван × Феофіла/Валерія',mother:'Карвацька',village:'Мицівці',vc:'m',y0:1897,y1:1904,
+  kids:['син ~1897','Николай 1899','Станіслав 1901','Антон 1904'],god:'Крушельницькі, Козловські, Януш'},
+ {n:'7',f:'Йосиф × Франциска/Павлина',mother:'—',village:'Мицівці',vc:'m',y0:1899,y1:1905,
+  kids:['донька 1899','Станіслав 1905'],god:'Крушельницькі, Козловські'},
+ {n:'8',f:'Рафаїл × Людвіка',mother:'Корчинська',village:'Мицівці',vc:'m',y0:1903,y1:1906,
+  kids:['Станіслав 1903','Николай 1904','Антоніна 1906'],god:'Борковські, Корнецькі, Кулаєвецькі, Ясінські'},
+ {n:'9',f:'Франц × Анна',mother:'Гординська',village:'Вихрівка',vc:'v',y0:1905,y1:1905,
+  kids:['Бронислав 1905'],god:'Каплінські'},
+];
+const older=[
+ {n:'—',f:'Іван × Емілія',mother:'—',village:'Мицівці',vc:'m',y0:1879,y1:1882,kids:['Антоля 1880','Анна †1882'],god:'—'},
+ {n:'—',f:'Іван × Маріанна',mother:'Погожельська',village:'Вербів',vc:'o',y0:1880,y1:1880,kids:['Войцех 1880'],god:'—'},
+ {n:'—',f:'Казимир × Єлисавета',mother:'Тржесньовська',village:'Мицівці',vc:'m',y0:1882,y1:1882,kids:['Марія 1882'],god:'—'},
+];
+const all=fam.concat(older);
+
+// axis ticks
+const ax=document.getElementById('axis');
+[1880,1885,1890,1895,1900,1905].forEach(y=>{
+  const t=document.createElement('div');t.className='tick';
+  t.style.left=((y-YMIN)/SPAN*100)+'%';t.innerHTML=y+'<i></i>';ax.appendChild(t);
+});
+
+// timeline rows
+const tl=document.getElementById('timeline');
+all.forEach(x=>{
+  const row=document.createElement('div');row.className='row';
+  const left=((x.y0-YMIN)/SPAN*100);
+  let w=((x.y1-x.y0+1)/SPAN*100); if(w<3)w=3;
+  const col=x.our?'var(--our)':V[x.vc];
+  const span=x.y0===x.y1?x.y0:x.y0+'–'+x.y1;
+  row.innerHTML=`<div class="fam"><b>${x.n==='⭐'?'⭐ ':x.n+'. '}${x.f}</b>
+     <small>${x.mother!=='—'?'з '+x.mother+' · ':''}${x.village}</small></div>
+     <div class="track"><div class="bar ${x.our?'our':''}" style="left:${left}%;width:${w}%;background:${col}">${span}</div></div>`;
+  tl.appendChild(row);
+});
+
+// cards
+const cw=document.getElementById('cards');
+all.forEach(x=>{
+  const col=x.our?'var(--our)':V[x.vc];
+  const c=document.createElement('div');c.className='card'+(x.our?' our':'');
+  c.innerHTML=`<h3>${x.n==='⭐'?'⭐ НАША: ':'№'+x.n+'. '}${x.f}${x.mother!=='—'?' (з '+x.mother+')':''}
+     <span class="tag" style="background:${col}">${x.village}</span></h3>
+     <div class="kids">${x.kids.map(k=>`<span class="k">${k}</span>`).join('')}</div>
+     <div class="meta">Роки: ${x.y0===x.y1?x.y0:x.y0+'–'+x.y1} · Хресні: ${x.god}</div>`;
+  cw.appendChild(c);
+});
+
+// table
+const tb=document.querySelector('#tbl tbody');
+all.forEach(x=>{
+  const tr=document.createElement('tr');
+  if(x.our)tr.style.background='#fffbeb';
+  tr.innerHTML=`<td>${x.n}</td><td>${x.f}${x.mother!=='—'?' <small>('+x.mother+')</small>':''}</td>
+    <td>${x.village}</td><td>${x.y0===x.y1?x.y0:x.y0+'–'+x.y1}</td>
+    <td>${x.kids.join(', ')}</td><td>${x.god}</td>`;
+  tb.appendChild(tr);
+});
+</script>
+
+<p style="max-width:1080px;margin:10px auto 0;color:#6b7280;font-size:12px">* Антоніна ~1892 — метрики народження поки не знайдено (шукати в Солобковецькому костелі; запит №11).</p>
+</body>
+</html>
