@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>Родовід — дерево від Максима і Людмили</title>
+<style>
+  :root{ --bg:#f3f1ec; --ink:#2a2420; --male:#2f6fa8; --female:#c23a63; --center:#c8962a; }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--ink); font-family:"Segoe UI","Helvetica Neue",Arial,sans-serif; }
+  header{ text-align:center; padding:20px 10px 8px; }
+  header h1{ margin:0 0 4px; font-size:23px; font-family:Georgia,serif; }
+  header p{ margin:0; font-size:13px; color:#665; }
+  #scroller{ overflow:auto; padding:20px 40px 60px; }
+  #stage{ position:relative; margin:0 auto; }
+  .card{
+    position:absolute; background:#fff; border-radius:10px;
+    padding:6px 8px 6px; text-align:center; box-shadow:0 2px 5px rgba(0,0,0,.14);
+    cursor:pointer; transition:box-shadow .15s, transform .1s;
+  }
+  .card:hover{ box-shadow:0 5px 14px rgba(0,0,0,.28); z-index:6; transform:translateY(-1px); }
+  .card.sex-M{ border:2px solid var(--male); }
+  .card.sex-F{ border:2px solid var(--female); }
+  .card.center{ border-width:3px; box-shadow:0 0 0 3px #fbe9c2, 0 3px 8px rgba(0,0,0,.2); }
+  .card.guess{ border-style:dashed; opacity:.82; }
+  .avatar{
+    width:26px; height:26px; border-radius:50%; margin:0 auto 3px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; font-weight:bold; color:#fff;
+  }
+  .sex-M .avatar{ background:var(--male); }
+  .sex-F .avatar{ background:var(--female); }
+  .pname{ font-size:10.8px; font-weight:600; line-height:1.2; }
+  .pyears{ font-size:9.5px; color:#887; margin-top:1px; }
+  #lines{ position:absolute; top:0; left:0; pointer-events:none; }
+  .tie{ position:absolute; font-size:11px; color:#b08a2e; transform:translate(-50%,-50%); pointer-events:none; }
+  #panel{
+    position:fixed; right:24px; bottom:24px; background:#1f1a15; color:#fdf6e8;
+    padding:16px 20px 14px; border-radius:12px; font-size:13px; line-height:1.6;
+    min-width:240px; max-width:360px; max-height:70vh; overflow-y:auto;
+    box-shadow:0 10px 30px rgba(0,0,0,.4); z-index:100;
+    display:none; font-family:Georgia,serif;
+  }
+  #panel b{ color:#f2d98a; font-size:14.5px; }
+  #panel .panel-close{
+    position:absolute; top:6px; right:10px; background:none; border:none;
+    color:#cbbf9f; font-size:16px; cursor:pointer; line-height:1;
+  }
+  #panel .panel-close:hover{ color:#fff; }
+  #legend{ display:flex; flex-wrap:wrap; gap:18px; justify-content:center; padding:6px 20px 26px; font-size:12px; color:#443; }
+  #legend .item{ display:flex; align-items:center; gap:6px; }
+  #legend .swatch{ width:14px; height:14px; border-radius:50%; display:inline-block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Родовід — дерево вгору й вниз від Максима і Людмили</h1>
+  <p>Кожна особа — окрема картка · синя рамка — чоловік, рожева — жінка · вгору предки, вниз нащадки, вбік брати/сестри · клікніть картку — деталі</p>
+</header>
+<div id="scroller"><div id="stage">
+  <svg id="lines"></svg>
+</div></div>
+<div id="legend"></div>
+<div id="panel"></div>
+
+<script>
+/* status: "ok" = документально підтверджено, "partial" = частково/усно, "guess" = реконструкція/гіпотеза */
+function P(name, years, place, status, note, sex, facts){ return {name:name, years:years||"", place:place||"", status:status||"ok", note:note||"", sex:sex||"M", facts:facts||null}; }
+function C(gen, people, left, right){ return {gen:gen, people:people, left:left||null, right:right||null}; }
+
+/* ===================== ДАНІ ===================== */
+
+// --- лінія Максима (факти — з родовід.html, звірено 1:1) ---
+var C4d = C(4,[ P("Герелишин Адам","?","","guess","","M",{"Примітка":"Батько Івана Адамовича (з по-батькові «Адамович» у метриці смерті 1944)"}) ]);
+var C4e = C(4,[ P("Петро (батько Єфросинії)","?","","guess","","M",{"Примітка":"З по-батькові Єфросинії «Петрівна»"}) ]);
+var C4f = C(4,[ P("Мельник (майстер-мірошник)","?","привезений з Угорщини","guess","","M",{"Походження":"Привезений з Угорщини","Заняття":"Будував млини на Кам'янець-Подільщині"}) ]);
+var C5b = C(5,[ P("Пащенко Диомид","?","","ok","","M",{"Примітка":"З по-батькові Івана «Диомидович»"}) ]);
+var C5c = C(5,[ P("Костянтин (батько Катерини)","?","","guess","","M",{"Примітка":"З по-батькові Катерини «Костянтинівна»"}) ]);
+var C5d = C(5,[ P("Васильниченко Ілля","?","","ok","","M",{"Встановлено (03.08.2026)":"Прізвище — Васильниченко, зі шлюбу доньки; селяни-власники м. Корсуня, православні"}) ]);
+
+var C6a = C(6,[
+  P("Янушкевич Адам","~1780-ті","м. Умань","ok","","M",{"З метрики сина (1822)":"Шляхтич (Generosus), м. Умань; хрещеним сина був Ян Янушкевич — імовірно брат або батько Адама","Шлюб (Geneteka, 03.08.2026)":"30.06.1804, м. Умань — з Регіною Пісанецькою (в індексі «Pisarzecka»); книги в ДАЖО, скан не оцифрований. Сестра(?) Анна Янушкевич ✕ Юзеф Загурський, 1803, Умань","Діти (Geneteka)":"Маріанна ~1805 (заміжня Залеська, шлюб 1824 Умань; онука Регіна 1826 — на честь бабусі), ймовірно Вінцентій ~1812–†1848, Дионисій 1822 (наш)","Ймовірні брати":"Szymon (×Tekla Iwaszkiewicz) і Stanisław (×Józefa Ostrowiecka) — Янушкевичі в Умані тих само років"}),
+  P("Янушкевич (Пісанецька) Регіна","~1784–14.11.1834","м. Умань","ok","","F",{"З метрики сина (1822)":"«Regina de Pisaneckich», шляхтянка, м. Умань; родичка — Вікторія Пісанецька (хрещена Дионисія)","Смерть (Geneteka)":"†14.11.1834, Умань, 50 років (акт 45; книги ДАХмО) — Дионисію було 12; того ж року померла й Текля (дружина Шимона) — можлива епідемія"})
+]);
+var C5a = C(5,[
+  P("Янушкевич Дионисій (Денис)","нар. 2/3.10.1822","м. Умань","ok","","M",{"Метрика знайдена (02.08.2026)":"м. Умань, хрещений 8.10.1822 («народжений шість днів тому»); батьки — шляхетні Адам і Регіна з Пісанецьких Янушкевичі; хрещені: пан Ян Янушкевич і пані Вікторія Пісанецька; хрестив унійний вікарій о. Йоан Козубський (запис латиною)","Дружина — ПІДТВЕРДЖЕНО ДОКУМЕНТАЛЬНО (03.08.2026)":"Францишка, уроджена Качоровська — метрика народження сина Луки (ДАХмО 685-2-1019, 1858); донька Idalia нар. 1845 у Богуславі","Діти":"Лука (наш), Анна Діонисіївна (Вороніна, Корсунь), Idalia (1845)"}),
+  P("Янушкевич (Качоровська) Францішка","?","","ok","підтв. метриками Луки 1858 і Ідалії 1845","F",{"🎯 Підтверджено ДВОМА метриками дітей (03.08.2026)":"Ідалія (2.12.1845, Богуслав, ДАХмО 685-2-1020): «Urodzoną Dyonizego i Franciszki z domu Kaczorowskich Januszkiewiczów ślubnych małżonków córka»; Лука (1858, ДАХмО 685-2-1019): «Мещанъ Дионисия и Францишки, урожденной Качоровской, Янушкевичов, законных супругов, сын»","⚠️ Спростовано (03.08.2026)":"Гіпотеза про смерть 24.01.1903 (FS-індекс) — перевірка скана показала іншу особу («Тельбович», с. Майденищі); справжня смерть Францішки невідома"})
+], C6a, null);
+var C4c = C(4,[
+  P("Янушкевич Лука Дионисиевич","нар. 9.09.1858, хрещ. 30.09.1858","м. Корсунь","ok","метрика знайдена 03.08.2026, ДАХмО 685-2-1019","M",{"Підтверджено (2026)":"Батько Марії; міщанин м. Корсунь, КАТОЛИК; по батькові Діонисіевич","Шлюби (знайдено 03.08.2026, FS)":"І: 8.09.1880 — Меланія Гавриїлівна Побірченкова (померла до 1883); ІІ: 28.01.1883, правосл. церква м. Корсунь — Дарія Іллівна Васильниченкова, 22 р.","Діти (повний список)":"Григорій 1884, Анна 1888, Антоній 1893, Марія 1896 (наша), Николай 1899†1900, Лідія 1903†1903, Олена 1905†1905","🎯 Метрика народження ЗНАЙДЕНА (03.08.2026)":"ДАХмО 685-2-1019, зап.№38: нар. 9.09.1858, хрещ. 30.09.1858, Корсунська філіальна церква Богуславського приходу; хрещені — князь Павло Лопухін і Вікторія Донцова Тряпицина"}),
+  P("Янушкевич (Васильниченкова) Дарія Іллівна","~1861","м. Корсунь","ok","","F",{"Підтверджено (2026)":"Мати Марії; православна; по батькові Іллівна","Дівоче прізвище (знайдено 03.08.2026)":"ВАСИЛЬНИЧЕНКОВА — зі шлюбного запису 28.01.1883: «м-ка Корсуня селянка-власниця, першим шлюбом, 22 роки»"})
+], C5a, C5d);
+var C4b = C(4,[
+  P("Пащенко Іван Диомидович","?","с. Тарасівка","ok","","M",{"Підтверджено (2026)":"Батько Порфирія (з метрики 1895); по батькові Диомидович","Діти":"Порфирій (1895), Анна, Степанида та ін."}),
+  P("Пащенко Катерина Костянтинівна","?","","ok","","F",{"Підтверджено (2026)":"Мати Порфирія (з метрики 1895)","По батькові":"Костянтинівна"})
+], C5b, C5c);
+var C3d = C(3,[
+  P("Пащенко Порфирій Іванович","нар. 1895","с. Тарасівка","ok","","M",{"Народження":"26.02.1895, с. Тарасівка, Звенигородський пов. — метрику знайдено (FamilySearch / ЦДІАК)","Батьки":"Іван Диомидович Пащенко × Катерина Костянтинівна","Шлюб":"3.05.1915, ц. с. Пединівка (з Марією Лукиничною Янушкевич)","Фах":"Українець, народний учитель; воював"}),
+  P("Пащенко (Янушкевич) Марія Лукинична","1896–~1944","м. Корсунь","ok","","F",{"Народження":"24.02.1896, парафія с. Кирилівка; хрещена православно — метрику знайдено (FamilySearch)","Батьки":"Лука Діонисіевич Янушкевич (міщанин Корсуня, католик) × Дарія Іллівна (православна)","Походження":"Польський католицький рід Янушкевичів, міщани м. Корсунь, Канівський пов.","Шлюб":"3.05.1915, ц. с. Пединівка (з Порфирієм Пащенком)","Смерть":"Казахстан, ~1944–1945 (ймовірно депортація/евакуація)"})
+], C4b, C4c);
+var C3c = C(3,[
+  P("Парик Калістрат Степанович","нар. 1886","с. Ляскорунь","partial","","M",{"Місце":"с. Ляскорунь (пізніше Зарічанка), Чемеровецький р-н","Заняття":"Візник — 2 коней, фаетон, колимага","🆕 Ляскорунь 1866 (2026)":"Сповідні: у парафії ~10 родин Париків. Метрики 1885–86: батьки-Парики Григорій Васильович і Даміан Дмитрович. По батькові Калістрата (Степан/Василь) — досі відкрите."}),
+  P("Парик Анна","~1890","зі збіднілих дворян Дніпропетровська","partial","","F",{"Походження":"З збіднілих дворян Дніпропетровська (Катеринослава)","Освіта":"Інститут шляхетних дівчат, Кам'янець-Под.; знала кілька мов"})
+]);
+var C4a = C(4,[
+  P("Сікорський Михаил","?","","ok","","M",{"Фах":"Відставний солдат","Місце":"с. Мицівці, Мукарівський приход","Етнос/віра":"поляк, римо-католик","Діти":"Антоніна (~1882), Антон (1883), Франц (1884), Михалина (1890), Броніслав (1894), Йосиф (1900)"}),
+  P("Сікорська (Гальовська) Анна","?","","ok","","F",{"Місце":"с. Мицівці, Мукарівський приход","Примітка":"Дружина Михаила Сікорського"})
+]);
+var C3b = C(3,[
+  P("Мельник Пилип Васильович","~1884–1967","с. Лошківці","ok","","M",{"Народження":"~1884 (підраховано: †5 червня 1967 у 83 роки)","Фах":"Артилерист (командир гармати), Георгіївський кавалер; син майстра-мірошника","Перша світова":"Служив на фронті; фото «с позиций» з підписом дружині Антоніні"}),
+  P("Мельник (Сікорська) Антоніна Михайлівна","~1892","с. Мицівці","ok","","F",{"Походження":"с. Мицівці, Мукарівський приход (Дунаєвеччина)","Етнос/віра":"полька, римо-католичка","Дівоче":"Сікорська — ПІДТВЕРДЖЕНО метриками ДАХмО","🆕 Батько підтверджено (2026)":"На звороті фото напис: «1932 год. Антонине Михайловне Мельник, исполнилось 40 лет» → по батькові МИХАЙЛІВНА"})
+], C4f, C4a);
+var C3a = C(3,[
+  P("Герелишин Іван Адамович","~1894–1944","с. Лошківці","ok","","M",{"Народження":"~1894 (за віком 50 р. у метриці смерті)","Смерть":"14.06.1944, с. Лошківці — від виразки 12-палої кишки","Фах":"службовець-охоронець нафтобази ст. Дунаївці","Документ":"Метрика смерті — заявниця Євфросинія Герелишина (дружина); ДАХмО Р6447 оп.1 спр.145, зап.№2"}),
+  P("Герелишина Єфросинія Петрівна","?","","guess","","F",{"Місце":"с. Лошківці","Примітка":"Мати Миколи та Володимира; вказана як найближча рідня у списку втрат"})
+], C4d, C4e);
+var C2a = C(2,[
+  P("Герелишин Микола Іванович","нар. 1920","с. Лошківці","ok","","M",{"Народження":"20.09.1920, с. Лошківці, Солобковецький р-н, Кам'янець-Подільська обл.","Фах":"Військовий медик (ст. лейтенант медслужби); на службі 1939–1959","Нагороди":"Орден Вітчизняної війни ІІ ст., Орден Червоної Зірки, медалі «За бойові заслуги», «За перемогу над Німеччиною»","Доля":"Після війни виїхав до Москви, новий син","Брат":"Володимир Іванович Герелишен (1918), танкіст, пропав безвісти 1941"}),
+  P("Мельник Лідія Пилипівна","нар. 1921","с. Лошківці","ok","","F",{"Місце":"с. Лошківці, Кам'янець-Подільщина","Стосунки":"НЕ були одружені з Миколою Герелишиним; їхній спільний син — Володимир (1944)","Репресії":"Працювала на фабриці під час окупації — за це після війни ув'язнена; у таборах (ГУЛАГ) до 1953 р."})
+], C3a, C3b);
+var C2b = C(2,[
+  P("Парик Іван Калістратович","1923–1944","загинув, УПА","partial","рідний батько Альвіни","M",{"Доля":"Член УПА; розстріляний німцями у березні 1944","Примітка":"Рідний (біологічний) батько Альвіни. З 9 дітей Калістрата й Анни вижили 4"}),
+  P("Пащенко (Решетнікова) Евеліна Порфирівна","1917–2008","с. Тарасівка","ok","","F",{"Народження":"18.12.1917, с. Тарасівка, Звенигородський р-н, Черкаська обл.","Фах":"Учителька (жила в Кам'янці-Подільському)","Репресії":"Арешт 03.10.1944 (УНКДБ, «співпраця з окупаційною владою»); 26.10.1944 справу припинено, звільнена; реабілітована 29.05.1998"})
+], C3c, C3d);
+var C1a = C(1,[
+  P("Герелишин Володимир Миколайович","нар. 1944","с. Лошківці","ok","","M",{"Народження":"10.08.1944 (с. Лошківці; актовий запис №9 від 11.08.1944)","Фах":"Інженер-зв'язківець; директор райвузла зв'язку (Баришівка)","Освіта/кар'єра":"Арктичне уч-ще (Ленінград) → полярна станція (м. Лаптєвих) → вище інж.-морське уч-ще","Шлюб":"1968 — з Альвіною Пащенко"}),
+  P("Гірілішена (Пащенко) Альвіна Тимофіївна","нар. 1944","","partial","рідний батько — Парик Іван Калістратович","F",{"Народження":"29.05.1944","Фах":"Лікар: терапевт (Кіровськ ЛО) → ендокринолог р-ну (Баришівка)","Рідний батько":"Парик Іван Калістратович (по батькові «Тимофіївна» — офіційне, записане на іншу людину, бо рідного батька розстріляли 1944)"})
+], C2a, C2b);
+
+// --- лінія Людмили ---
+var C3e = C(3,[ P("Кремез Олексій","?","с. Россохи","partial","","M"), P("Кремез Марія","?","","partial","","F") ]);
+var C3f = C(3,[ P("Мишлевич Андрій","?","","partial","","M"), P("Мишлевич Тетяна","?","","partial","","F") ]);
+var C2c = C(2,[ P("Кремез Семен Олексійович","нар. 1910","с. Россохи","ok","","M"), P("Кремез (Мишлевич) Катерина Андріївна","нар. 1920","","ok","","F") ], C3e, C3f);
+var C3g = C(3,[ P("Налпенко Кузьма","?","с. Чайки","partial","","M") ]);
+var C3h = C(3,[ P("Коваленко Юхим Кіндратович","нар. 1884","","partial","","M"), P("Коваленко (Шнуренко) Параска Юхимівна","~1892–1987","","ok","","F") ]);
+var C2d = C(2,[ P("Налпенко Валентин Кузьмович","1926–1996","с. Чайки","ok","","M"), P("Налпенко (Капустенко) Олександра","нар. 1894","м. Богуслав","partial","","F") ], C3g, C3h);
+var C1b = C(1,[ P("Кремез Віталій Семенович","нар. 1947","","ok","","M"), P("Кремез (Налпенко) Тамара Валентинівна","?","","ok","","F") ], C2c, C2d);
+
+// --- центр ---
+var C0 = C(0,[
+  P("Гірілішен Максим Володимирович","нар. 07.12.1981","","ok","","M",{"Народження":"07.12.1981"}),
+  P("Гірілішена (Кремез) Людмила Віталіївна","нар. 06.09.1982","м. Київ","ok","","F",{"Народження":"06.09.1982, м. Київ","Дівоче прізвище":"Кремез","Батьки":"Кремез Віталій Семенович × Кремез (Налпенко) Тамара Валентинівна"})
+], C1a, C1b);
+
+/* ===================== ЛЕЙАУТ ГОЛОВНОГО ДЕРЕВА ПРЕДКІВ ===================== */
+function width(node){
+  if(!node) return 0;
+  if(node._w) return node._w;
+  var lw = width(node.left), rw = width(node.right);
+  node._w = (lw + rw) || 1;
+  return node._w;
+}
+function assignX(node, xStart){
+  if(!node) return;
+  width(node);
+  if(!node.left && !node.right){ node._x = xStart + 0.5; return; }
+  var cursor = xStart;
+  if(node.left){ assignX(node.left, cursor); cursor += node.left._w; }
+  if(node.right){ assignX(node.right, cursor); }
+  var xs = [];
+  if(node.left) xs.push(node.left._x);
+  if(node.right) xs.push(node.right._x);
+  node._x = xs.length===2 ? (xs[0]+xs[1])/2 : xs[0];
+}
+width(C0);
+assignX(C0, 0);
+
+var UNIT_PX = 300, ROW_H = 165, CARD_W = 118, CARD_W_C = 128, GAP = 14, GAP_C = 18, CARD_H = 76;
+var TOP_MARGIN = 30, LEFT_MARGIN = 60;
+var MAXGEN = 6;
+
+function place(node){
+  node.px = LEFT_MARGIN + node._x * UNIT_PX;
+  node.py = TOP_MARGIN + (MAXGEN - node.gen) * ROW_H;
+  if(node.left) place(node.left);
+  if(node.right) place(node.right);
+}
+place(C0);
+
+/* ===================== СИБЛІНГИ ТА ЇХНІ НАЩАДКИ (вбік і вниз) ===================== */
+var sibAndriy = C(0,[ P("Гірілішен Андрій","~1969","","partial","","M"), P("Гірілішена Лариса","?","","partial","","F") ]);
+var sibAnya   = C(0,[ P("Волинюк (Гірілішена) Анна","1973","","partial","","F"), P("Волинюк Дмитро","?","","partial","","M") ]);
+var sibIhor   = C(0,[ P("Кремез Ігор Віталійович","?","","partial","","M"), P("Кремез Тетяна","?","","partial","","F") ]);
+
+var d1a = C(-1,[ P("Бакуров Ілля","?","","partial","","M"), P("Бакуров (Гірілішена) Ярослава","?","","partial","","F") ]);
+var d1b = C(-1,[ P("Гірілішена Софія","?","","partial","","F") ]);
+var d1a1 = C(-2,[ P("Бакуров Бенжамін","?","","partial","","M") ]);
+
+var d2a = C(-1,[ P("Волинюк Яна","?","","partial","","F") ]);
+var d2b = C(-1,[ P("Немелян Станіслав (Стас)","?","","partial","","M"), P("Немелян (Волинюк) Оксана","?","","partial","","F") ]);
+var d2b1 = C(-2,[ P("Немелян Владислав","?","","partial","","M") ]);
+
+var d3a = C(-1,[ P("Кремез Тимофій","?","","partial","","M") ]);
+var d3b = C(-1,[ P("Кремез Тіна","?","","partial","","F") ]);
+
+var childMaya = C(-1,[ P("Гірілішена Майя Максимівна","?","","partial","","F") ]);
+var childEmma = C(-1,[ P("Гірілішена Емма Максимівна","2015","","ok","","F") ]);
+
+/* ручне позиціювання бічних гілок відносно центру C0 */
+sibAndriy.px = C0.px - 700; sibAndriy.py = C0.py;
+sibAnya.px   = C0.px - 380; sibAnya.py   = C0.py;
+sibIhor.px   = C0.px + 520; sibIhor.py   = C0.py;
+
+d1a.px = sibAndriy.px - 95; d1a.py = C0.py + ROW_H;
+d1b.px = sibAndriy.px + 95; d1b.py = C0.py + ROW_H;
+d1a1.px = d1a.px; d1a1.py = C0.py + 2*ROW_H;
+
+d2a.px = sibAnya.px - 95; d2a.py = C0.py + ROW_H;
+d2b.px = sibAnya.px + 95; d2b.py = C0.py + ROW_H;
+d2b1.px = d2b.px; d2b1.py = C0.py + 2*ROW_H;
+
+d3a.px = sibIhor.px - 70; d3a.py = C0.py + ROW_H;
+d3b.px = sibIhor.px + 70; d3b.py = C0.py + ROW_H;
+
+var childRowY = C0.py + ROW_H;
+childMaya.px = C0.px - 60; childMaya.py = childRowY;
+childEmma.px = C0.px + 60; childEmma.py = childRowY;
+
+var allNodes = [C0,C1a,C1b,C2a,C2b,C2c,C2d,C3a,C3b,C3c,C3d,C3e,C3f,C3g,C3h,C4a,C4b,C4c,C5a,C6a,
+                C4d,C4e,C4f,C5b,C5c,C5d,
+                sibAndriy,sibAnya,sibIhor,d1a,d1b,d1a1,d2a,d2b,d2b1,d3a,d3b,childMaya,childEmma];
+
+/* Кожен вузол з 2 картками має _leftX/_rightX — центр картки person0 і person1.
+   Лінія вгору до предків/збоку до сиблінгів має чіплятись до конкретної картки
+   (кровного боку), а не до умовної середини пари. */
+function cardWidth(node){ return node===C0 ? CARD_W_C : CARD_W; }
+function computeAttach(n){
+  var w = cardWidth(n), gap = n===C0 ? GAP_C : GAP;
+  if(n.people.length===2){
+    n._leftX = n.px - gap/2 - w/2;
+    n._rightX = n.px + gap/2 + w/2;
+  } else {
+    n._leftX = n._rightX = n.px;
+  }
+}
+allNodes.forEach(computeAttach);
+
+/* конектор = {top, x, y}: top — вузол-джерело (використовує top.px, спільну
+   точку шлюбу), x/y — де саме на нижній картці лінія має закінчитись */
+var connectors = [];
+allNodes.forEach(function(n){
+  if(n.left) connectors.push({top:n.left, x:n._leftX, y:n.py});
+  if(n.right) connectors.push({top:n.right, x:n._rightX, y:n.py});
+});
+/* сиблінги Максима (Андрій, Аня) і сам Максим — усі троє чіпляються до
+   ОДНІЄЇ лінії від Володимира+Альвіни, саме через картку Максима (person0 C0).
+   Конектор C1a -> C0 вже створений автоматичним циклом вище (через C0._leftX),
+   тут додаємо лише сиблінгів, щоб вони приєднались до тієї ж лінії. */
+connectors.push({top:C1a, x:sibAndriy._leftX, y:sibAndriy.py});
+connectors.push({top:C1a, x:sibAnya._leftX,  y:sibAnya.py});
+/* сиблінг Людмили (Ігор) — до лінії від Віталія+Тамари (C1b -> C0 вже є вище) */
+connectors.push({top:C1b, x:sibIhor._leftX, y:sibIhor.py});
+
+connectors.push({top:sibAndriy, x:d1a._rightX, y:d1a.py}); // Ярослава — кровна дитина
+connectors.push({top:sibAndriy, x:d1b._leftX,  y:d1b.py}); // Софія
+connectors.push({top:d1a,       x:d1a1._leftX, y:d1a1.py});
+connectors.push({top:sibAnya,   x:d2a._leftX,  y:d2a.py}); // Яна
+connectors.push({top:sibAnya,   x:d2b._rightX, y:d2b.py}); // Оксана — кровна дитина
+connectors.push({top:d2b,       x:d2b1._leftX, y:d2b1.py});
+connectors.push({top:sibIhor,   x:d3a._leftX,  y:d3a.py});
+connectors.push({top:sibIhor,   x:d3b._leftX,  y:d3b.py});
+connectors.push({top:C0,        x:childMaya._leftX, y:childMaya.py});
+connectors.push({top:C0,        x:childEmma._leftX, y:childEmma.py});
+
+/* ===================== РЕНДЕР ===================== */
+var stage = document.getElementById("stage");
+var panel = document.getElementById("panel");
+var statusTxt = {ok:"✔ документально підтверджено", partial:"◐ частково підтверджено", guess:"✶ реконструкція/гіпотеза"};
+
+function showPanel(p){
+  var html = '<button class="panel-close">×</button>';
+  html += "<b>" + p.name + "</b><br>" + (p.years || "рік невідомий");
+  if(p.place) html += "<br>" + p.place;
+  if(p.note) html += "<br><i>" + p.note + "</i>";
+  html += "<br><span style='color:#9ad'>" + statusTxt[p.status] + "</span>";
+  if(p.facts){
+    for(var key in p.facts){
+      html += "<hr style='border-color:#443;margin:8px 0;'>";
+      html += "<b>" + key + ":</b> " + p.facts[key];
+    }
+  }
+  panel.innerHTML = html;
+  panel.style.display = "block";
+  panel.scrollTop = 0;
+  panel.querySelector(".panel-close").addEventListener("click", function(e){
+    e.stopPropagation();
+    panel.style.display = "none";
+  });
+}
+document.addEventListener("click", function(e){
+  if(panel.style.display==="block" && !panel.contains(e.target) && !e.target.closest(".card")){
+    panel.style.display = "none";
+  }
+});
+
+function nodeSpanHalf(node){
+  var w = cardWidth(node), gap = node===C0 ? GAP_C : GAP;
+  return node.people.length===2 ? (w + gap/2) : w/2;
+}
+
+var maxPx = 0, maxPy = 0;
+allNodes.forEach(function(n){
+  maxPx = Math.max(maxPx, n.px + nodeSpanHalf(n) + 20);
+  maxPy = Math.max(maxPy, n.py + CARD_H + 20);
+});
+stage.style.width = (maxPx + 40) + "px";
+stage.style.height = (maxPy + 20) + "px";
+
+var svg = document.getElementById("lines");
+svg.setAttribute("width", maxPx + 40);
+svg.setAttribute("height", maxPy + 20);
+
+var SVGNS = "http://www.w3.org/2000/svg";
+function drawLine(x1,y1,x2,y2){
+  var path = document.createElementNS(SVGNS,"path");
+  path.setAttribute("d", "M " + x1 + " " + y1 + " L " + x2 + " " + y2);
+  path.setAttribute("fill","none");
+  path.setAttribute("stroke","#b7ac96");
+  path.setAttribute("stroke-width","1.6");
+  svg.appendChild(path);
+}
+
+/* Групуємо за спільним "батьківським" вузлом: усі діти одного вузла
+   з'єднуються з ОДНІЄЮ горизонтальною лінією (лінія сиблінгів), від якої
+   вниз ідуть окремі відводи до кожної дитини — як у зразку. */
+var groupMap = new Map();
+connectors.forEach(function(conn){
+  if(!groupMap.has(conn.top)) groupMap.set(conn.top, []);
+  groupMap.get(conn.top).push({x:conn.x, y:conn.y});
+});
+groupMap.forEach(function(children, top){
+  var x1 = top.px, y1 = top.py + CARD_H;
+  var y2 = children[0].y;
+  var midY = y1 + (y2 - y1) * 0.55;
+  drawLine(x1, y1, x1, midY); // стовбур від батьків вниз
+  /* горизонтальна лінія завжди має включати x1 (точку стовбура), інакше
+     коли дитина — пара (її картка зсунута ліворуч/праворуч від center x),
+     стовбур і відвід опиняються на різних x і лінія рветься */
+  var xs = children.map(function(c){ return c.x; });
+  xs.push(x1);
+  var xmin = Math.min.apply(null, xs), xmax = Math.max.apply(null, xs);
+  if(xmax > xmin) drawLine(xmin, midY, xmax, midY); // спільна горизонтальна лінія
+  children.forEach(function(ch){
+    drawLine(ch.x, midY, ch.x, ch.y); // відвід до кожної дитини
+  });
+});
+
+function initials(name){
+  var parts = name.replace(/\s*\([^)]*\)\s*/g," ").trim().split(/\s+/);
+  return (parts[0] ? parts[0][0] : "") + (parts[1] ? parts[1][0] : "");
+}
+
+allNodes.forEach(function(n){
+  var w = cardWidth(n);
+  var gap = n===C0 ? GAP_C : GAP;
+  var positions;
+  if(n.people.length===2){
+    positions = [ n.px - gap/2 - w, n.px + gap/2 ];
+  } else {
+    positions = [ n.px - w/2 ];
+  }
+  n.people.forEach(function(p, i){
+    var div = document.createElement("div");
+    div.className = "card sex-" + p.sex + (n===C0 ? " center" : "") + (p.status==="guess" ? " guess" : "");
+    div.style.left = positions[i] + "px";
+    div.style.top = n.py + "px";
+    div.style.width = w + "px";
+    div.innerHTML =
+      '<div class="avatar">' + initials(p.name) + '</div>' +
+      '<div class="pname">' + p.name + '</div>' +
+      (p.years ? '<div class="pyears">' + p.years + '</div>' : '');
+    div.addEventListener("click", function(e){
+      e.stopPropagation();
+      showPanel(p);
+    });
+    stage.appendChild(div);
+  });
+  if(n.people.length===2){
+    var tie = document.createElement("div");
+    tie.className = "tie";
+    tie.style.left = n.px + "px";
+    tie.style.top = (n.py + CARD_H/2) + "px";
+    tie.textContent = "⚭";
+    stage.appendChild(tie);
+  }
+});
+
+/* легенда */
+var legendData = [
+  {c:"#2f6fa8", t:"Чоловік"},
+  {c:"#c23a63", t:"Жінка"},
+  {c:"#c8962a", t:"Максим і Людмила (центр)"},
+  {c:"#c7c2b8", t:"Пунктир — реконструкція / гіпотеза"}
+];
+var legend = document.getElementById("legend");
+legendData.forEach(function(l){
+  var item = document.createElement("div"); item.className = "item";
+  var sw = document.createElement("span"); sw.className = "swatch"; sw.style.background = l.c;
+  var lbl = document.createElement("span"); lbl.textContent = l.t;
+  item.appendChild(sw); item.appendChild(lbl); legend.appendChild(item);
+});
+</script>
+</body>
+</html>
