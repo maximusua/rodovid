@@ -3,13 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Родини Сікорських — Мукарівська парафія</title>
+<title>Родини Сікорських — Мукарівська і Солобковецька парафії</title>
 <style>
   :root{
     --mic:#2563eb;      /* Мицівці */
     --vyh:#16a34a;      /* Вихрівка */
     --oth:#9ca3af;      /* інше село */
-    --our:#d97706;      /* наша родина */
+    --our:#d97706;      /* наша родина (підтверджена) */
+    --maybe:#dc2626;    /* можливо наша родина (не підтверджено) */
+    --pro:#7c3aed;      /* Проскурівка */
+    --tar:#0891b2;      /* Тарасівка */
+    --slb:#be185d;      /* Солобківці (місто) */
     --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --bg:#f8fafc;
   }
   *{box-sizing:border-box}
@@ -22,6 +26,7 @@
   .legend span{display:inline-flex;align-items:center;gap:6px}
   .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
   h2{font-size:16px;margin:28px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  h2.section{font-size:19px;margin-top:40px;border-bottom:2px solid var(--ink)}
   /* timeline */
   .axis{position:relative;height:22px;margin:6px 0 4px;border-bottom:1px solid var(--line)}
   .tick{position:absolute;top:0;font-size:11px;color:var(--muted);transform:translateX(-50%)}
@@ -35,15 +40,18 @@
   .bar{position:absolute;top:3px;height:20px;border-radius:5px;display:flex;align-items:center;
        padding:0 8px;color:#fff;font-size:11.5px;white-space:nowrap;overflow:hidden;font-weight:600}
   .bar.our{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--our)}
+  .bar.maybe{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--maybe);}
   /* cards */
   .card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:10px 0;background:#fff}
   .card.our{border-color:var(--our);background:#fffbeb}
+  .card.maybe{border-color:var(--maybe);background:#fef2f2;border-style:dashed;border-width:2px}
   .card h3{margin:0 0 4px;font-size:15px}
   .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;color:#fff;vertical-align:middle;margin-left:6px}
   .kids{margin:6px 0 0;font-size:13px}
   .kids .k{display:inline-block;background:var(--bg);border:1px solid var(--line);border-radius:16px;
            padding:2px 9px;margin:3px 4px 0 0;font-size:12px}
   .meta{font-size:12.5px;color:var(--muted);margin-top:6px}
+  .warn{font-size:12.5px;color:#b45309;margin-top:6px}
   table{border-collapse:collapse;width:100%;font-size:13px;margin-top:8px}
   th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
   th{background:var(--bg);font-size:12px}
@@ -54,15 +62,21 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>Родини Сікорських — Мукарівська римо-католицька парафія</h1>
-  <p class="sub">Робоче зведення за метричними книгами (ДАХмО, Ф.17). Села Мицівці й Вихрівка, кін. XIX – поч. XX ст. Наша гілка (Антоніни) — виділена.</p>
+  <h1>Родини Сікорських — Мукарівська і Солобковецька римо-католицькі парафії</h1>
+  <p class="sub">Робоче зведення за метричними книгами (ДАХмО, Ф.17, Ф.685, Ф.83). Села Мицівці й Вихрівка (Мукарівська парафія), Проскурівка й Тарасівка (Солобковецька парафія), кін. XIX – поч. XX ст. Наша підтверджена гілка (Антоніни) — виділена жовтим; найважливіший непідтверджений кандидат (Михайло×Анна з Ланецьких, Солобківці) — виділений червоним пунктиром.</p>
 
   <div class="legend">
-    <span><i class="dot" style="background:var(--our)"></i> НАША родина</span>
+    <span><i class="dot" style="background:var(--our)"></i> НАША підтверджена родина</span>
+    <span><i class="dot" style="background:var(--maybe)"></i> МОЖЛИВО наша (не підтверджено)</span>
     <span><i class="dot" style="background:var(--mic)"></i> с. Мицівці</span>
     <span><i class="dot" style="background:var(--vyh)"></i> с. Вихрівка</span>
+    <span><i class="dot" style="background:var(--pro)"></i> с. Проскурівка</span>
+    <span><i class="dot" style="background:var(--tar)"></i> с. Тарасівка</span>
+    <span><i class="dot" style="background:var(--slb)"></i> м. Солобківці</span>
     <span><i class="dot" style="background:var(--oth)"></i> інше село</span>
   </div>
+
+  <h2 class="section">Мукарівська парафія (Мицівці, Вихрівка)</h2>
 
   <h2>Шкала: коли яка родина «активна» (роки народжень дітей)</h2>
   <div id="axis" class="axis"></div>
@@ -77,16 +91,33 @@
     <tbody></tbody>
   </table>
 
+  <h2 class="section">Солобковецька парафія (Проскурівка, Тарасівка, м. Солобківці)</h2>
+  <p class="sub" style="margin-top:-4px">Знахідки 07–08.08.2026. Джерело: <code>max_rid/fonds-full/new_cat/Solobkowce/</code> (ф.17-2-155/156/158/159, ф.685, ф.83), фотографії Алекса Кітлінського (genealogie-kresowe.pl). Детальні транскрипції — у розділі «СОЛОБКОВЕЦЬКИЙ костел» робочого MD-файлу (C-1…C-7).</p>
+
+  <h2>Шкала</h2>
+  <div id="axis2" class="axis"></div>
+  <div id="timeline2"></div>
+
+  <h2>Родини — детально</h2>
+  <div id="cards2"></div>
+
+  <h2>Зведена таблиця</h2>
+  <table id="tbl2">
+    <thead><tr><th>#</th><th>Батько × Мати (дів. прізв.)</th><th>Село</th><th>Роки</th><th>Діти</th><th>Коло хресних</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
   <div class="tips">
     <b>🔑 Як розрізняти родини (коли ім'я батька нечітке):</b>
     <ul>
-      <li><b>Село:</b> наша — <b>Мицівці</b>; вихрівські (Михаил×Опольська, Антон×Мищинська, Іван×Тонтмановська, Франц×Гординська) — <b>Вихрівка</b>.</li>
-      <li><b>Мати:</b> наша — <b>Анна з Гальовських</b>. Інші матері: Шидловська, Опольська, Мищинська, Тонтмановська, Карвацька, Корчинська, Крушельницька/Павлина, Гординська.</li>
-      <li><b>Хресні (найнадійніше):</b> наша — <b>Вишимірські / Козловські / Добровольські</b>. Опольські/Боровські → вихрівський Михаил; Шидловські → Станіслав; Тонтмановські/Козицькі → Іван (Вихрівка); Крушельницькі/Януш → Іван (Мицівці, Карвацька); Борковські/Ясінські → Рафаїл; Каплінські → Франц.</li>
+      <li><b>Село:</b> наша — <b>Мицівці</b>; вихрівські (Михаил×Опольська, Антон×Мищинська, Іван×Тонтмановська, Франц×Гординська) — <b>Вихрівка</b>; солобковецькі — <b>Проскурівка</b> (кілька різних Іванів!) і <b>Тарасівка</b> (Антон×Марія).</li>
+      <li><b>Мати:</b> наша — <b>Анна з Гальовських</b> (можливо = «з Ланецьких» у Солобківцях, не підтверджено). Інші матері: Шидловська, Опольська, Мищинська, Тонтмановська, Карвацька, Корчинська, Крушельницька/Павлина, Гординська, Юзефа, Анна/Агнія Ковалевська/Ковельська, Марія Защинська.</li>
+      <li><b>Хресні (найнадійніше):</b> наша — <b>Вишимірські / Козловські / Добровольські</b>. Опольські/Боровські → вихрівський Михаил; Шидловські → Станіслав; Тонтмановські/Козицькі → Іван (Вихрівка); Крушельницькі/Януш → Іван (Мицівці, Карвацька); Борковські/Ясінські → Рафаїл; Каплінські → Франц. <b>Добровольські трапляються і в Солобківцях</b> (можливий місток між гілками).</li>
+      <li><b>У Проскурівці одночасно щонайменше 2, можливо 3 різні Івани Сікорські</b> — розрізняти за дружиною (Юзефа vs Анна/Агнія Ковалевська/Ковельська). Не плутати дітей між ними!</li>
     </ul>
   </div>
 
-  <p class="foot">Джерело даних: <code>Сікорські_родини_Мукарова_РОБОЧЕ.md</code>. Оновлюється в міру читання сканів.</p>
+  <p class="foot">Джерело даних: <code>Сікорські_родини_Мукарова_РОБОЧЕ.md</code>. Оновлюється в міру читання сканів. Останнє оновлення: 08.08.2026.</p>
 </div>
 
 <script>
@@ -120,49 +151,88 @@ const older=[
 ];
 const all=fam.concat(older);
 
-// axis ticks
-const ax=document.getElementById('axis');
-[1880,1885,1890,1895,1900,1905].forEach(y=>{
-  const t=document.createElement('div');t.className='tick';
-  t.style.left=((y-YMIN)/SPAN*100)+'%';t.innerHTML=y+'<i></i>';ax.appendChild(t);
-});
+// === Солобковецька парафія ===
+const V2={p:'var(--pro)',t:'var(--tar)',s:'var(--slb)'};
+const solob=[
+ {n:'0',maybe:true,f:'відст. солдат Михаил × Анна',mother:'Ланецька(?)/Гальовська(?)',village:'м. Солобківці',vc:'s',y0:1885,y1:1889,
+  kids:['Станіслав ~1885 (†1889)'],god:'—',
+  warn:'⚠️ НЕ ПІДТВЕРДЖЕНО — можливо це та сама «наша» пара (Михаил відст.солдат × Анна), що в Мицівцях, тільки записана в Солобковецькій парафії. Дівоче прізвище дружини тут «Ланецька», що могло б бути третім писарським варіантом «Гальовської»/«Ганецької».'},
+ {n:'C-5',f:'Іван × Юзефа',mother:'—',village:'Проскурівка',vc:'p',y0:1885,y1:1885,
+  kids:['Антоніна 1885'],god:'—',
+  warn:'Один з 2-3 різних Іванів Сікорських у Проскурівці — не плутати з Іваном×Анною/Агнією нижче.'},
+ {n:'C-3',f:'Іван × Анна',mother:'Ковальська',village:'Проскурівка',vc:'p',y0:1883,y1:1891,
+  kids:['Тереза 1883','Ядвіга 1886','Александра 1888 (†1891)','Йосип(?)','Карл(?)','Розалія(?)','Марія(?)','Антоніна(Мельник)(?)'],
+  god:'Саницькі, Добровольські',
+  warn:'†Іван 1916 (ДАХмО Ф.17 оп.2 спр.157 №59). 3 дитини з точними датами (1883,1886,1888) + 5 без дат зі списку 1916 р.'},
+ {n:'C-2',f:'Антон × Марія',mother:'Защинська',village:'Тарасівка',vc:'t',y0:1883,y1:1888,
+  kids:['Карл 1883','донька 1885','Іпполіт 1888'],god:'Станишевські, Вишлинські',warn:''},
+];
 
-// timeline rows
-const tl=document.getElementById('timeline');
-all.forEach(x=>{
-  const row=document.createElement('div');row.className='row';
-  const left=((x.y0-YMIN)/SPAN*100);
-  let w=((x.y1-x.y0+1)/SPAN*100); if(w<3)w=3;
-  const col=x.our?'var(--our)':V[x.vc];
-  const span=x.y0===x.y1?x.y0:x.y0+'–'+x.y1;
-  row.innerHTML=`<div class="fam"><b>${x.n==='⭐'?'⭐ ':x.n+'. '}${x.f}</b>
-     <small>${x.mother!=='—'?'з '+x.mother+' · ':''}${x.village}</small></div>
-     <div class="track"><div class="bar ${x.our?'our':''}" style="left:${left}%;width:${w}%;background:${col}">${span}</div></div>`;
-  tl.appendChild(row);
-});
+function renderAxis(elId, ticks){
+  const ax=document.getElementById(elId);
+  ticks.forEach(y=>{
+    const t=document.createElement('div');t.className='tick';
+    t.style.left=((y-YMIN)/SPAN*100)+'%';t.innerHTML=y+'<i></i>';ax.appendChild(t);
+  });
+}
+function renderTimeline(elId, list, colorMap){
+  const tl=document.getElementById(elId);
+  list.forEach(x=>{
+    const row=document.createElement('div');row.className='row';
+    const left=((x.y0-YMIN)/SPAN*100);
+    let w=((x.y1-x.y0+1)/SPAN*100); if(w<3)w=3;
+    let col=colorMap[x.vc];
+    let cls='';
+    if(x.our){col='var(--our)';cls='our';}
+    if(x.maybe){col='var(--maybe)';cls='maybe';}
+    const span=x.y0===x.y1?x.y0:x.y0+'–'+x.y1;
+    row.innerHTML=`<div class="fam"><b>${(x.n==='⭐'||x.n==='0')?(x.our?'⭐ ':'⚠️ ')+x.n+' ':x.n+'. '}${x.f}</b>
+       <small>${x.mother!=='—'?'з '+x.mother+' · ':''}${x.village}</small></div>
+       <div class="track"><div class="bar ${cls}" style="left:${left}%;width:${w}%;background:${col}">${span}</div></div>`;
+    tl.appendChild(row);
+  });
+}
+function renderCards(elId, list, colorMap){
+  const cw=document.getElementById(elId);
+  list.forEach(x=>{
+    let col=colorMap[x.vc];
+    let cls='';
+    if(x.our){col='var(--our)';cls=' our';}
+    if(x.maybe){col='var(--maybe)';cls=' maybe';}
+    const c=document.createElement('div');c.className='card'+cls;
+    const label = x.our? '⭐ НАША: ' : (x.maybe? '⚠️ МОЖЛИВО НАША (№'+x.n+'): ' : '№'+x.n+'. ');
+    c.innerHTML=`<h3>${label}${x.f}${x.mother!=='—'?' (з '+x.mother+')':''}
+       <span class="tag" style="background:${col}">${x.village}</span></h3>
+       <div class="kids">${x.kids.map(k=>`<span class="k">${k}</span>`).join('')}</div>
+       <div class="meta">Роки: ${x.y0===x.y1?x.y0:x.y0+'–'+x.y1} · Хресні: ${x.god}</div>
+       ${x.warn?`<div class="warn">${x.warn}</div>`:''}`;
+    cw.appendChild(c);
+  });
+}
+function renderTable(sel, list){
+  const tb=document.querySelector(sel+' tbody');
+  list.forEach(x=>{
+    const tr=document.createElement('tr');
+    if(x.our)tr.style.background='#fffbeb';
+    if(x.maybe)tr.style.background='#fef2f2';
+    tr.innerHTML=`<td>${x.n}</td><td>${x.f}${x.mother!=='—'?' <small>('+x.mother+')</small>':''}</td>
+      <td>${x.village}</td><td>${x.y0===x.y1?x.y0:x.y0+'–'+x.y1}</td>
+      <td>${x.kids.join(', ')}</td><td>${x.god}</td>`;
+    tb.appendChild(tr);
+  });
+}
 
-// cards
-const cw=document.getElementById('cards');
-all.forEach(x=>{
-  const col=x.our?'var(--our)':V[x.vc];
-  const c=document.createElement('div');c.className='card'+(x.our?' our':'');
-  c.innerHTML=`<h3>${x.n==='⭐'?'⭐ НАША: ':'№'+x.n+'. '}${x.f}${x.mother!=='—'?' (з '+x.mother+')':''}
-     <span class="tag" style="background:${col}">${x.village}</span></h3>
-     <div class="kids">${x.kids.map(k=>`<span class="k">${k}</span>`).join('')}</div>
-     <div class="meta">Роки: ${x.y0===x.y1?x.y0:x.y0+'–'+x.y1} · Хресні: ${x.god}</div>`;
-  cw.appendChild(c);
-});
+// Мукарівська парафія
+renderAxis('axis',[1880,1885,1890,1895,1900,1905]);
+renderTimeline('timeline', all, V);
+renderCards('cards', all, V);
+renderTable('#tbl', all);
 
-// table
-const tb=document.querySelector('#tbl tbody');
-all.forEach(x=>{
-  const tr=document.createElement('tr');
-  if(x.our)tr.style.background='#fffbeb';
-  tr.innerHTML=`<td>${x.n}</td><td>${x.f}${x.mother!=='—'?' <small>('+x.mother+')</small>':''}</td>
-    <td>${x.village}</td><td>${x.y0===x.y1?x.y0:x.y0+'–'+x.y1}</td>
-    <td>${x.kids.join(', ')}</td><td>${x.god}</td>`;
-  tb.appendChild(tr);
-});
+// Солобковецька парафія
+renderAxis('axis2',[1883,1885,1887,1889,1891]);
+renderTimeline('timeline2', solob, V2);
+renderCards('cards2', solob, V2);
+renderTable('#tbl2', solob);
 </script>
 
 <p style="max-width:1080px;margin:10px auto 0;color:#6b7280;font-size:12px">* Антоніна ~1892 — метрики народження поки не знайдено (шукати в Солобковецькому костелі; запит №11).</p>
