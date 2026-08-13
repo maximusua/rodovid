@@ -49,12 +49,38 @@
   #legend{ display:flex; flex-wrap:wrap; gap:18px; justify-content:center; padding:6px 20px 26px; font-size:12px; color:#443; }
   #legend .item{ display:flex; align-items:center; gap:6px; }
   #legend .swatch{ width:14px; height:14px; border-radius:50%; display:inline-block; }
+  .linebooks{ margin:10px auto 0; max-width:820px; }
+  .linebooks-title{ font-size:11.5px; color:#7a7266; letter-spacing:.3px; margin-bottom:6px; font-family:Georgia,serif; }
+  .linebooks-row{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+  .linebooks-row .lb{
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    padding:7px 15px; border-radius:8px; text-decoration:none;
+    background:#fff; border:1px solid #d8cdb4; color:#4a3f30;
+    font-family:Georgia,serif; font-size:13px; line-height:1.35;
+    box-shadow:0 1px 3px rgba(0,0,0,.10); transition:box-shadow .15s, transform .1s;
+  }
+  .linebooks-row .lb:hover{ box-shadow:0 4px 12px rgba(0,0,0,.18); transform:translateY(-1px); }
+  .linebooks-row .lb span{ font-size:10.8px; color:#8a8172; font-family:"Segoe UI",Arial,sans-serif; }
 </style>
 </head>
 <body>
 <header>
   <h1>Родовід — дерево вгору й вниз від Максима і Людмили</h1>
   <p>Кожна особа — окрема картка · синя рамка — чоловік, рожева — жінка · вгору предки, вниз нащадки, вбік брати/сестри · клікніть картку — деталі</p>
+  <div class="linebooks">
+    <div class="linebooks-title">Книги окремих ліній — скани метрик із розшифровками</div>
+    <div class="linebooks-row">
+      <a href="Родовід_Пащенки_до_Лаврентія_1734.pdf" target="_blank" class="lb">
+        &#128214; Рід Пащенків <span>9 поколінь · до Лаврентія, бл. 1734 · 30 сканів</span>
+      </a>
+      <a href="Родовід_Янушкевичі_до_Адама_1804.pdf" target="_blank" class="lb">
+        &#128214; Рід Янушкевичів <span>7 поколінь · до Адама, шлюб 1804 · Умань–Корсунь</span>
+      </a>
+      <a href="Родовід_повна_версія.pdf" target="_blank" class="lb">
+        &#128196; Повна версія <span>усі 6 гілок, з фото</span>
+      </a>
+    </div>
+  </div>
 </header>
 <div id="scroller"><div id="stage">
   <svg id="lines"></svg>
